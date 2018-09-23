@@ -1,0 +1,11 @@
+Package: demandmap
+Type: Package
+Title: Demand Map
+Version: 0.1.0
+Author: Casey Woolfolk
+Maintainer: Casey Woolfolk <ccwoolfolk@gmail.com>
+Description: Generate a demand map visualization using Census Bureau data.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Depends: readxl, tidyr, dplyr, ggplot2, maps, rlang

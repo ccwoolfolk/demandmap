@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\\name{hello}\n\\alias{hello}\n\\title{Hello, World!}\n\\usage{\nhello()\n}\n\\description{\nPrints 'Hello, world!'.\n}\n\\examples{\nhello()\n}\n",
+    "created" : 1537731399832.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3093437535",
+    "id" : "60818D33",
+    "lastKnownWriteTime" : 1537728868,
+    "last_content_update" : 1537728868,
+    "path" : "~/Projects/demandmap/man/hello.Rd",
+    "project_path" : "man/hello.Rd",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}
