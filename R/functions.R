@@ -1,8 +1,8 @@
-### ----- makeWeightsInput -----------------------------------------------------
-### Create a data.frame with labels and weights columns
-### labels = character[n].
-### weights = numeric[n].
-### ----------------------------------------------------------------------------
+#' Create paired weight and label input objects
+#'
+#' @param labels character[n].
+#' @param weights numeric[n].
+#' @return data.frame with labels and weights columns
 makeWeightsInput <- function(labels, weights) {
   stopifnot(length(labels) == length(weights))
 
@@ -13,10 +13,10 @@ makeWeightsInput <- function(labels, weights) {
   )
 }
 
-### ----- getData --------------------------------------------------------------
-### Get the full state-level data set
-### Returns a tibble
-### ----------------------------------------------------------------------------
+
+#' Get the full state-level data set
+#'
+#' @return a tibble
 getData <- function () {
   packageData <- censusData
   colTypes <- strsplit(x='text	text	text	text	text	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric', split='\t')[[1]]
@@ -31,12 +31,12 @@ getData <- function () {
   return(packageData)
 }
 
-### ----- getTotal -------------------------------------------------------------
-### Calculate the total of a column, aggregated by NAICS.id
-### naics = vector of NAICS.id values
-### columnLabel = expr[1]. Column heading - ESTAB, EMP, etc.
-### Returns vector of numeric values representing sum of column for NAICS.id's
-### ----------------------------------------------------------------------------
+#' Calculate the total of a column, aggregated by NAICS.id
+#'
+#' @param data tibble
+#' @param naics vector of NAICS.id values
+#' @param columnLabel expr[1]. Column heading - ESTAB, EMP, etc.
+#' @eturn vector of numeric values representing sum of column for NAICS.id's
 getTotal <- function (data, naics, columnLabel) {
   totalQuo <- enquo(columnLabel)
 
@@ -47,21 +47,21 @@ getTotal <- function (data, naics, columnLabel) {
   industryTotals$total[match(naics, industryTotals$NAICS.id)]
 }
 
-### ----- getWeights -----------------------------------------------------------
-### labels = vector of NAICS.id values, column names, etc. [n]
-### wts = matrix[n, 2] with labels in col 1 and weights in col 2 (0.5, etc)
-### Returns vector of numeric values repsenting weights for corres. labels
-### ----------------------------------------------------------------------------
+#' Retrieve weights for a given set of labels from a source table
+#'
+#' @param labels vector of NAICS.id values, column names, etc. [n]
+#' @param wts matrix[n, 2] with labels in col 1 and weights in col 2 (0.5, etc)
+#' @return Vector of numeric values repsenting weights for corres. labels
 getWeights <- function (labels, wts) {
   wts[match(labels, wts[ ,1]), 2]
 }
 
-### ----- addPctColumn ---------------------------------------------------------
-### Add a "pctLABEL" column that shows the % of total for that label (EMP) in that NAICS code
-### data = tibble
-### columnLabels = character[n].
-### Returns tibble with "pctCOLUMNLABEL" column attached
-### ----------------------------------------------------------------------------
+
+#' Add a "pctLABEL" column that shows the percent of total for that label (EMP) in that NAICS code
+#'
+#' @param data tibble
+#' @param columnLabels character[n]
+#' @return Tibble with "pctCOLUMNLABEL" column attached
 addPctColumn <- function(data, columnLabels) {
   if (length(columnLabels) < 1) return(data)
 
@@ -75,13 +75,12 @@ addPctColumn <- function(data, columnLabels) {
   )
 }
 
-### ----- addScoreColumn ---------------------------------------------------------
-### Add a "score" column that calcs score based on both industry and label weights
-### data = tibble
-### industryWeights = data.frame with 'labels' and 'weights' columns
-### metricWeights = data.frame with 'labels' and 'weights' columns
-### Returns tibble with "score" column attached
-### ----------------------------------------------------------------------------
+#' Add a "score" column that calcs score based on both industry and label weights
+#'
+#' @param data tibble
+#' @param industryWeights data.frame with 'labels' and 'weights' columns
+#' @param metricWeights data.frame with 'labels' and 'weights' columns
+#' @return Tibble with "score" column attached
 addScoreColumn <- function (data, industryWeights, metricWeights) {
   cols <- paste('pct', metricWeights[ ,1], sep='')
   rawScores <- data[ ,cols] * matrix(metricWeights$weights, nrow=nrow(data), ncol=nrow(metricWeights), byrow=TRUE)
@@ -95,11 +94,10 @@ addScoreColumn <- function (data, industryWeights, metricWeights) {
   )
 }
 
-### ----- aggregateStateScores -------------------------------------------------
-### Convert a tibble with "stateName" and "totalScore" column into a simple data.frame for plotting
-### data = tibble
-### Returns tibble with state, totalScore, long, lat, and printScore cols
-### ----------------------------------------------------------------------------
+#' Convert a tibble with "stateName" and "totalScore" column into a simple data.frame for plotting
+#'
+#' @param data tibble
+#' @return Tibble with state, totalScore, long, lat, and printScore cols
 aggregateStateScores <- function(data) {
   if (!is.tbl(data)) stop('aggregateStateScores requires a tibble')
   if (!('totalScore' %in% names(data))) stop('No totalScore column header')
@@ -122,14 +120,12 @@ aggregateStateScores <- function(data) {
   return(as_tibble(df))
 }
 
-### ----- data2stateScores ------------------------------------------------------
-###
-### rawData = tibble representing Census Bureau data set
-### metricWeights = data.frame with "labels" (char.) and "weights" (num.)
-### industryWeights = data.frame with "labels" (char.) and "weights" (num.)
-###
-### Returns a tibble with state, totalScore, long, lat, and printScore cols
-### ----------------------------------------------------------------------------
+#' Convert weight inputs and raw data into aggregated scores by state
+#'
+#' @param rawData tibble representing Census Bureau data set
+#' @param metricWeights data.frame with "labels" (char.) and "weights" (num.)
+#' @param industryWeights data.frame with "labels" (char.) and "weights" (num.)
+#' @return A tibble with state, totalScore, long, lat, and printScore cols
 data2stateScores <- function(rawData, metricWeights, industryWeights) {
   dataWithMetricColumns <- addPctColumn(rawData, as.character(metricWeights$labels))
   dataWithScores <- addScoreColumn(dataWithMetricColumns, industryWeights, metricWeights)
@@ -144,14 +140,11 @@ data2stateScores <- function(rawData, metricWeights, industryWeights) {
   stateScores <- aggregateStateScores(stateScoreInputs)
 }
 
-### ----- plotDemandMap ---------------------------------------------------------
-### Create a ggplot object representing the demand map
-### mapData = data.frame w/ long, lat, and region columns; region = state name
-###           This provides the lat/lon for the state boundaries
-### stateScoresData = tibble w/ state, totalScore, printScore, lat, and long
-###                   This provides the lat/lon for the state midpoints
-### Returns ggplot
-### ----------------------------------------------------------------------------
+#' Create a ggplot object representing the demand map
+#'
+#' @param mapData data.frame w/ long, lat, and region columns; region = state name. This provides the lat/lon for the state boundaries.
+#' @param stateScoresData tibble w/ state, totalScore, printScore, lat, and long. This provides the lat/lon for the state midpoints.
+#' @return ggplot
 plotDemandMap <- function(mapData, stateScoresData) {
   gg <- ggplot()
   gg <- gg + geom_map(data=mapData, map=mapData,
@@ -162,3 +155,8 @@ plotDemandMap <- function(mapData, stateScoresData) {
                       color="#ffffff", size=0.15) + coord_quickmap()
   gg + geom_text(data=stateScoresData, aes(x=long, y=lat, label=printScore), color='white', size=3)
 }
+
+#' Census Bureau data set
+#'
+#' Contains state and NAICS detail from the Census Bureau
+"censusData"
