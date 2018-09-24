@@ -9,4 +9,5 @@ License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10), readxl, tidyr, dplyr, ggplot2, maps, rlang
+Suggest: testthat (>= 2.0.0)
 RoxygenNote: 6.1.0
