@@ -4,7 +4,7 @@
 \name{censusData}
 \alias{censusData}
 \title{Census Bureau data set}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 22238 rows and 18 columns.}
+\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 22206 rows and 18 columns.}
 \usage{
 censusData
 }

@@ -2,10 +2,14 @@
 ### Create data/raw.RData
 ### ----------------------------------------------------------------------------
 makeData <- function () {
-  censusData <- read_excel(
+  rawData <- read_excel(
     paste('data-raw/full-mfg.xlsx', sep=''),
-    col_types = 'text',
-    skip=1
-  )
+    col_types = 'text'
+  )[-1, ]
+
+  ### Remove Washington D.C.
+  censusData <- rawData %>% filter(`GEO.display-label` != 'District of Columbia')
+
+
   devtools::use_data(censusData, internal=TRUE, overwrite=TRUE)
 }
