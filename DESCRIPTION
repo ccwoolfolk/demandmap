@@ -8,4 +8,5 @@ Description: Generate a demand map visualization using Census Bureau data.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Depends: readxl, tidyr, dplyr, ggplot2, maps, rlang
+Depends: R (>= 2.10), readxl, tidyr, dplyr, ggplot2, maps, rlang
+RoxygenNote: 6.1.0
