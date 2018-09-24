@@ -48,6 +48,20 @@ test_that('addPctColumns()', {
 
 })
 
+test_that('filterIndustries()', {
+  testData <- as_tibble(data.frame(
+    NAICS.id=1:6 * 10,
+    EMP=6:1,
+    ESTAB=6:1
+  ))
+
+  industryLabels <- c(20, 40, 50)
+
+  result <- filterIndustries(testData, industryLabels)
+  expect_equal(nrow(result), length(industryLabels))
+  expect_equal(result$NAICS.id, industryLabels)
+})
+
 test_that('addScoreColumn()', {
   emp <- 1:6
   estab <- 6:1

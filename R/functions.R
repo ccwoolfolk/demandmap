@@ -56,6 +56,14 @@ getWeights <- function (labels, wts) {
   wts[match(labels, wts[ ,1]), 2]
 }
 
+#' Filter a tibble by industry
+#'
+#' @param dataToFilter tibble
+#' @param industries character[n]. Industry codes to include
+#' @return tibble with only the NAICS codes in industries
+filterIndustries <- function(dataToFilter, industries) {
+  dataToFilter %>% filter(NAICS.id %in% industries)
+}
 
 #' Add a "pctLABEL" column that shows the percent of total for that label (EMP) in that NAICS code
 #'
@@ -127,7 +135,10 @@ aggregateStateScores <- function(data) {
 #' @param industryWeights data.frame with "labels" (char.) and "weights" (num.)
 #' @return A tibble with state, totalScore, long, lat, and printScore cols
 data2stateScores <- function(rawData, metricWeights, industryWeights) {
-  dataWithMetricColumns <- addPctColumn(rawData, as.character(metricWeights$labels))
+  dataWithMetricColumns <- addPctColumn(
+    filterIndustries(rawData, industryWeights$labels),
+    as.character(metricWeights$labels)
+  )
   dataWithScores <- addScoreColumn(dataWithMetricColumns, industryWeights, metricWeights)
 
   stateScoreInputs <- dataWithScores %>% select(
