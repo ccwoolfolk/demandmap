@@ -148,7 +148,7 @@ data2stateScores <- function(rawData, metricWeights, industryWeights) {
   )
 
   names(stateScoreInputs) <- c('stateName', 'totalScore')
-  stateScores <- aggregateStateScores(stateScoreInputs)
+  return(aggregateStateScores(stateScoreInputs))
 }
 
 #' Create a ggplot object representing the demand map
