@@ -18,23 +18,17 @@ makeWeightsInput <- function(labels, weights) {
 ### Returns a tibble
 ### ----------------------------------------------------------------------------
 getData <- function () {
-  raw <- read_excel(
-    paste(dataPath, 'raw.xlsx', sep=''),
-    col_types = 'text',
-    skip=1
-  )
-
-  data <- raw[-1, ]
+  packageData <- censusData
   colTypes <- strsplit(x='text	text	text	text	text	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric	numeric', split='\t')[[1]]
   for (i in 1:length(colTypes)) {
     type <- colTypes[i]
     if (type == 'numeric') {
-      values <- as.numeric(pull(data[ ,i]))
+      values <- as.numeric(pull(packageData[ ,i]))
       values[is.na(values)] <- 0 # Note, this replaces any NAs with zero for now
-      data[ ,i] <- values
+      packageData[ ,i] <- values
     }
   }
-  return(data)
+  return(packageData)
 }
 
 ### ----- getTotal -------------------------------------------------------------
