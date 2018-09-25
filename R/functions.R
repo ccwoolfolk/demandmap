@@ -159,12 +159,34 @@ data2stateScores <- function(rawData, metricWeights, industryWeights) {
 plotDemandMap <- function(mapData, stateScoresData) {
   gg <- ggplot()
   gg <- gg + geom_map(data=mapData, map=mapData,
-                      aes(map_id=tolower(region)),
+                      aes(
+                        x=long,  # Include here to force plotting region to
+                        y=lat,   # size correctly.
+                        map_id=tolower(region)
+                      ),
                       fill="#ffffff", color="black", size=0.15)
   gg <- gg + geom_map(data=stateScoresData, map=mapData,
-                      aes(fill=totalScore, map_id=tolower(state)),
+                      aes(fill=printScore, map_id=tolower(state)),
                       color="#ffffff", size=0.15) + coord_quickmap()
-  gg + geom_text(data=stateScoresData, aes(x=long, y=lat, label=printScore), color='white', size=3)
+  gg <- gg + geom_text(
+    data=stateScoresData,
+    aes(x=long, y=lat, label=printScore),
+    color='white',
+    size=3
+  )
+  # Change legend label text
+  gg$labels$fill <- 'Shading Scale'
+
+  # Remove axis ticks and labels
+  gg + theme(
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  ) + theme(
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank()
+  )
 }
 
 #' Census Bureau data set
