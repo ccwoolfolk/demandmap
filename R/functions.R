@@ -151,6 +151,24 @@ data2stateScores <- function(rawData, metricWeights, industryWeights) {
   return(aggregateStateScores(stateScoreInputs))
 }
 
+#' Remove axis labels and ticks from a ggplot object
+#'
+#' @param ggplotObject ggplot
+#' @return ggplot
+removeMapAxisLabels <- function(ggplotObject) {
+  return (
+    ggplotObject + theme(
+      axis.title.x=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    ) + theme(
+      axis.title.y=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks.y=element_blank()
+    )
+  )
+}
+
 #' Create a ggplot object representing the demand map
 #'
 #' @param mapData data.frame w/ long, lat, and region columns; region = state name. This provides the lat/lon for the state boundaries.
@@ -178,15 +196,45 @@ plotDemandMap <- function(mapData, stateScoresData) {
   gg$labels$fill <- 'Shading Scale'
 
   # Remove axis ticks and labels
-  gg + theme(
-    axis.title.x=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  ) + theme(
-    axis.title.y=element_blank(),
-    axis.text.y=element_blank(),
-    axis.ticks.y=element_blank()
+  removeMapAxisLabels(gg)
+}
+
+#' Create a ggplot object representing a sales territory map
+#'
+#' @param mapData data.frame w/ long, lat, and region columns; region = state name. This provides the lat/lon for the state boundaries.
+#' @param regionData tibble w/ state and salesRegion columns
+#' @return ggplot
+plotRegionMap <- function(mapData, regionData) {
+  gg <- ggplot()
+  gg <- gg + geom_map(data=mapData, map=mapData,
+                      aes(
+                        x=long,  # Include here to force plotting region to
+                        y=lat,   # size correctly.
+                        map_id=tolower(region)
+                      ),
+                      fill="#ffffff", color="black", size=0.15)
+  gg <- gg + geom_map(data=regionData, map=mapData,
+                      aes(fill=salesRegion, map_id=tolower(state)),
+                      color="#ffffff", size=0.15) + coord_quickmap()
+
+  # Plot region name at avg lon/lat of region here...
+  stateCenters <- datasets::state.center
+
+  regionAvgs <- regionData %>% mutate(
+    x = stateCenters$x[match(tolower(state), tolower(datasets::state.name))],
+    y = stateCenters$y[match(tolower(state), tolower(datasets::state.name))]
+  ) %>% group_by(salesRegion) %>% summarize(
+    x = mean(x),
+    y = mean(y)
   )
+  gg <- gg + guides(fill=FALSE) + geom_text(
+    data=regionAvgs,
+    aes(x=x, y=y, label=salesRegion),
+    color='black',
+    size=3
+  )
+
+  removeMapAxisLabels(gg)
 }
 
 #' Census Bureau data set
